@@ -27,7 +27,7 @@ $('table').csvExport();
 ```
 * **Example**
 ```
-$(this).next().next().csvExport({
+$('table').csvExport({
   title: "Table_Test",
   beforeStart: function(t){
     console.log(t);
