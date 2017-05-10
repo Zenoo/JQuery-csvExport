@@ -1,0 +1,36 @@
+{
+  "name": "csvexporter",
+  "title": "jQuery Table To CSV Exporter",
+  "description": "Export your HTML tables to CSV format.",
+  "keywords": [
+    "jquery-plugins",
+    "jquery-plugin",
+    "ecosystem:jquery",
+    "csv",
+    "export",
+    "table"
+  ],
+  "version": "1.1.2",
+  "author": {
+    "name": "Zenoo",
+    "url": "https://github.com/Zenoo"
+  },
+  "maintainers": [
+    {
+      "name": "Zenoo",
+      "url": "https://github.com/Zenoo"
+    }
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "bugs": "https://github.com/Zenoo/JQuery-csvExport/issues",
+  "homepage": "https://github.com/Zenoo/JQuery-csvExport",
+  "repository": "https://github.com/Zenoo/JQuery-csvExport#readme",
+  "dependencies": {
+    "jquery": ">=1.4"
+  }
+}
