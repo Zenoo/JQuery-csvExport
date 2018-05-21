@@ -2,29 +2,29 @@
     $.fn.extend({
         csvExport: function(options) {
             this.defaultOptions = {
-                escapeContent:true,
-                title:'Exported_Table',
-                beforeStart : function(none, table) {},
-                onStringReady : function(none, currentString) {}
+                escapeContent: true,
+                title: 'Exported_Table',
+                beforeStart: function(table) {},
+                onStringReady: function(currentString) {}
             };
 
-            var settings = $.extend({}, this.defaultOptions, options);
+            let settings = $.extend({}, this.defaultOptions, options);
 
             //MULTIPLE OBJECTS HANDLER
             return this.each(function() {
-                var $this = $(this);
-                var real = {x:0,y:0};
-                var toExpand = {x:[],y:[]}; // Objects to insert : { ori : {x:0,y:O}, toDo : xxx, done : xxx }
-                var theString = '';
+                let $this = $(this);
+                let real = {x:0,y:0};
+                let toExpand = {x:[],y:[]}; // Objects to insert : { ori : {x:0,y:O}, toDo : xxx, done : xxx }
+                let theString = '';
                 
                 //BEFORESTART CALLBACK
                 settings.beforeStart.call(undefined,$this);
                 
-                $this.children().children('tr').each(function(){ 
-                	var currentTR = $(this);
+                $('tr',$this).each(function(){ 
+                	let currentTR = $(this);
                 	
                 	currentTR.children().each(function(){ 
-                		var currentTD = $(this);
+                		let currentTD = $(this);
                 		
                 		spanChecker();
                 		
@@ -65,49 +65,32 @@
         	    a.click();
     
     			function spanChecker(){
-    				var colspanHandler = true;
+    				let colspanHandler = true;
             		while(colspanHandler){
-            			var broken = false;
-            			
-            			//ROWSPAN CHECKER
-                        for(var i = 0; i < toExpand.y.length; i++){
+						let broken = false;
+						
+						for(let direction of ['y','x']){
+							let other = direction == 'y' ? 'x' : 'y';
+
+							for(let i = 0; i < toExpand[direction].length; i++){
                         	
-                        	if(deleteChecker(toExpand.y,i) && i > 0){ // Move on if task done
-                        		i--;
-                        	} 
-                    		
-                        	if(toExpand.y.length > 0){
-                        		if(real.x == toExpand.y[i].ori.x){
-                        			if(real.y == toExpand.y[i].ori.y + toExpand.y[i].done){
-                        				theString+='"",';
-                        				toExpand.y[i].done++;
-                        				broken=true;
-                        				real.x++;
-                        				break;
-                        			}
-                        		}
-                        	}
-                        }
-                        
-                        //COLSPAN CHECKER
-                        for(var i = 0; i < toExpand.x.length; i++){
-                        	
-                        	if(deleteChecker(toExpand.x,i) && i > 0){ // Move on if task done
-                        		i--;
-                        	} 
-                    		
-                        	if(toExpand.x.length > 0){
-                        		if(real.y == toExpand.x[i].ori.y){
-                        			if(real.x == toExpand.x[i].ori.x + toExpand.x[i].done){
-                        				theString+='"",';
-                        				toExpand.x[i].done++;
-                        				broken=true;
-                        				real.x++;
-                        				break;
-                        			}
-                        		}
-                        	}
-                        }
+								if(deleteChecker(toExpand[direction],i) && i > 0){ // Move on if task done
+									i--;
+								} 
+								
+								if(toExpand[direction].length > 0){
+									if(real[other] == toExpand[direction][i].ori[other]){
+										if(real[direction] == toExpand[direction][i].ori[direction] + toExpand[direction][i].done){
+											theString+='"",';
+											toExpand[direction][i].done++;
+											broken=true;
+											real.x++;
+											break;
+										}
+									}
+								}
+							}
+						}
                         
                         if(!broken) colspanHandler=false;
             		}
