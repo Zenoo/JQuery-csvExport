@@ -45,7 +45,7 @@
 		        						});
 		        		}
                 	
-                		theString+='"'+contentCheckup(Array.from(currentTD[0].childNodes).map(e => e.innerText || e.textContent.replace(/\s/g, '').length ? e.textContent : '').join(' '))+'",';
+                		theString+='"'+contentCheckup(Array.from(currentTD[0].childNodes).map(e => e.innerText || e.textContent.replace(/\s/g, '').length ? e.textContent : '').join(' ')).replace(/\s+/g,' ')+'",';
                 		real.x++;
                 		/* CURRENT TD HANDLER __END */
                 		
