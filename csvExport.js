@@ -4,79 +4,53 @@
             this.defaultOptions = {
                 escapeContent: true,
                 title: 'Exported_Table',
-                beforeStart: function(table) {},
-                onStringReady: function(currentString) {}
+                beforeStart: function() {},
+                onStringReady: function() {}
             };
 
-            let settings = $.extend({}, this.defaultOptions, options);
+			const settings = $.extend({}, this.defaultOptions, options);
 
             //MULTIPLE OBJECTS HANDLER
             return this.each(function() {
-                let $this = $(this);
-                let real = {x:0,y:0};
-                let toExpand = {x:[],y:[]}; // Objects to insert : { ori : {x:0,y:O}, toDo : xxx, done : xxx }
-                let theString = '';
-                
-                //BEFORESTART CALLBACK
-                settings.beforeStart.call(undefined,$this);
-                
-                $('tr',$this).each(function(){ 
-                	let currentTR = $(this);
-                	
-                	currentTR.children().each(function(){ 
-                		let currentTD = $(this);
-                		
-                		spanChecker();
-                		
-                		/* CURRENT TD HANDLER __START */
-                		if(currentTD.is('[colspan]')){
-                			toExpand.x.push({
-                							ori:{x:real.x,y:real.y},
-                							toDo:+currentTD.attr('colspan'),
-                							done:1
-                						});
-                		}
-                	
-		            	if(currentTD.is('[rowspan]')){
-		        			toExpand.y.push({
-		        							ori:{x:real.x,y:real.y},
-		        							toDo:+currentTD.attr('rowspan'),
-		        							done:1
-		        						});
-		        		}
-                	
-                		theString+='"'+contentCheckup(Array.from(currentTD[0].childNodes).map(e => e.innerText || e.textContent.replace(/\s/g, '').length ? e.textContent : '').join(' ')).replace(/\s+/g,' ')+'",';
-                		real.x++;
-                		/* CURRENT TD HANDLER __END */
-                		
-                	});
-                	
-                	theString = theString.substring(0, theString.length - 1);
-                	theString+='\r\n';
-            		real.x=0;
-            		real.y++;
-                });
-                
-                settings.onStringReady.call(undefined,theString);
-                
-                var a = document.createElement('a');
-        	    a.href = 'data:application/vnd.ms-excel;base64,' + window.btoa(unescape(encodeURIComponent(theString)));
-        	    a.download = settings.title + '.csv';
-        	    a.click();
-    
-    			function spanChecker(){
-    				let colspanHandler = true;
-            		while(colspanHandler){
-						let broken = false;
-						
-						for(let direction of ['y','x']){
-							let other = direction == 'y' ? 'x' : 'y';
+                const $this = $(this);
+                const real = {
+					x: 0,
+					y: 0
+				};
+				// Objects to insert : { ori : {x:0,y:O}, toDo : xxx, done : xxx }
+                const toExpand = {
+					x: [],
+					y: []
+				};
+				let theString = '';
 
+				function deleteChecker(parent, pos){
+					if(parent[pos].toDo == parent[pos].done){
+						parent.splice(pos, pos+1);
+
+						return true;
+					}
+			
+					return false;
+				}
+				
+				function spanChecker(){
+					let colspanHandler = true;
+	
+					while(colspanHandler){
+						let broken = false,
+							directions = ['y', 'x'];
+
+						for(let k = 0; k< directions.length; k++){
+							const direction = directions[k];
+							const other = direction == 'y' ? 'x' : 'y';
+	
 							for(let i = 0; i < toExpand[direction].length; i++){
-                        	
-								if(deleteChecker(toExpand[direction],i) && i > 0){ // Move on if task done
+							
+								// Move on if task done
+								if(deleteChecker(toExpand[direction], i) && i > 0){
 									i--;
-								} 
+								}
 								
 								if(toExpand[direction].length > 0){
 									if(real[other] == toExpand[direction][i].ori[other]){
@@ -91,27 +65,116 @@
 								}
 							}
 						}
-                        
-                        if(!broken) colspanHandler=false;
-            		}
-    			}
+						
+						if(!broken) colspanHandler=false;
+					}
+				}
 
+				function contentCheckup(data){
+					data = data.replace(/\./g, ',');
+					if(settings.escapeContent) return data.replace(/([\\"])/g, '\\$1');
+					
+					return data;
+				}
+
+				function b64toBlob(b64Data, contentType, sliceSize) {
+					contentType = contentType || '';
+					sliceSize = sliceSize || 512;
+				
+					let byteCharacters = atob(b64Data);
+					let byteArrays = [];
+				
+					for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+						let slice = byteCharacters.slice(offset, offset + sliceSize),
+							byteNumbers = new Array(slice.length);
+
+						for (let i = 0; i < slice.length; i++) {
+							byteNumbers[i] = slice.charCodeAt(i);
+						}
+						
+						let byteArray = new Uint8Array(byteNumbers);
+						
+						byteArrays.push(byteArray);
+					}
+				
+					let blob = new Blob(byteArrays, {type: contentType});
+
+					return blob;
+				}
+                
+                //BEFORESTART CALLBACK
+                settings.beforeStart.call(null, $this);
+                
+                $('tr', $this).each(function(){
+					const currentTR = $(this);
+					
+					currentTR.children().each(function(){
+						const currentTD = $(this);
+						
+						spanChecker();
+						
+						/* CURRENT TD HANDLER __START */
+						if(currentTD.is('[colspan]')){
+							toExpand.x.push({
+								ori: {
+									x: real.x,
+									y: real.y
+								},
+								toDo: +currentTD.attr('colspan'),
+								done: 1
+							});
+						}
+				
+						if(currentTD.is('[rowspan]')){
+							toExpand.y.push({
+								ori: {
+									x: real.x,
+									y: real.y
+								},
+								toDo: +currentTD.attr('rowspan'),
+								done: 1
+							});
+						}
+
+						let currentCellString = '',
+							currentCellNodes = currentTD[0].childNodes;
+
+						for(let i = 0; i < currentCellNodes.length; i++){
+							currentCellString += (currentCellNodes[i].innerText || currentCellNodes[i].textContent.replace(/\s/g, '').length ? currentCellNodes[i].textContent : '') + ' ';
+						}
+
+						currentCellString = contentCheckup(currentCellString).replace(/\s+/g, ' ');
+						
+						theString+='"'+currentCellString+'",';
+						real.x++;
+						/* CURRENT TD HANDLER __END */
+					});
+					
+					theString = theString.substring(0, theString.length - 1);
+					theString+='\r\n';
+					real.x=0;
+					real.y++;
+                });
+                
+				settings.onStringReady.call(null, theString);
+
+				const
+					fileData = window.btoa(unescape(encodeURIComponent(theString))),
+					title = settings.title + '.csv';
+				
+				// IE Fix
+				if(navigator.userAgent.indexOf('MSIE ') > 0 || navigator.userAgent.match(/Trident.*rv\:11\./)){
+					const blobObject = b64toBlob(fileData);
+
+					window.navigator.msSaveOrOpenBlob(blobObject, title);
+				}else{
+					const a = document.createElement('a');
+
+					a.href = 'data:application/vnd.ms-excel;base64,' + fileData;
+					a.download = title;
+					a.click();
+				}
             });
-            
-            function deleteChecker(parent,pos){
-            	if(parent[pos].toDo == parent[pos].done){
-            		parent.splice(pos,pos+1);
-            		return true;
-            	}
-            	else return false;
-            }
-            
-            function contentCheckup(data){
-            	data = data.replace(/\./g, ',');
-				if(settings.escapeContent) return data.replace(/([\\"])/g,'\\$1');
-				else return data;
-			}
-            
         }
     });
-})(jQuery);
+}(jQuery));
