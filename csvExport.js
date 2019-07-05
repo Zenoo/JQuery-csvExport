@@ -71,7 +71,9 @@
 				}
 
 				function contentCheckup(data){
-					data = data.replace(/\./g, ',');
+					// Replacing dot(.) with comma (,) makes decimal values incorrect.
+					// better to commit cout this line.
+					//data = data.replace(/\./g, ','); older
 					if(settings.escapeContent) return data.replace(/([\\"])/g, '\\$1');
 					
 					return data;
@@ -142,8 +144,10 @@
 						for(let i = 0; i < currentCellNodes.length; i++){
 							currentCellString += (currentCellNodes[i].innerText || currentCellNodes[i].textContent.replace(/\s/g, '').length ? currentCellNodes[i].textContent : '') + ' ';
 						}
-
-						currentCellString = contentCheckup(currentCellString).replace(/\s+/g, ' ');
+						// using regx to add space in column val creates problem as it appends space on boths sides. 
+						//currentCellString = contentCheckup(currentCellString).replace(/\s+/g, ' '); // older
+						// we can simply trims space and let intra space be there
+						currentCellString = currentCellString.trim(); // updated
 						
 						theString+='"'+currentCellString+'",';
 						real.x++;
@@ -160,7 +164,10 @@
 
 				const
 					fileData = window.btoa(unescape(encodeURIComponent(theString))),
-					title = settings.title + '.csv';
+				      // appedning .csv to file title makes it filen_name.csv.csv
+				      // it is better to commit .csv appending string
+					// title = settings.title + '.csv'; // older
+				      title = settings.title // updated
 				
 				// IE Fix
 				if(navigator.userAgent.indexOf('MSIE ') > 0 || navigator.userAgent.match(/Trident.*rv\:11\./)){
