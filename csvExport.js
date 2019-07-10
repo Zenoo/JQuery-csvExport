@@ -1,24 +1,24 @@
 (function($){
-    $.fn.extend({
-        csvExport: function(options) {
-            this.defaultOptions = {
-                escapeContent: true,
-                title: 'Exported_Table',
-                beforeStart: function() {},
-                onStringReady: function() {}
-            };
+	$.fn.extend({
+		csvExport: function(options) {
+			this.defaultOptions = {
+				escapeContent: true,
+				title: 'Exported_Table.csv',
+				beforeStart: function() {},
+				onStringReady: function() {}
+			};
 
 			const settings = $.extend({}, this.defaultOptions, options);
 
-            //MULTIPLE OBJECTS HANDLER
-            return this.each(function() {
-                const $this = $(this);
-                const real = {
+			//MULTIPLE OBJECTS HANDLER
+			return this.each(function() {
+				const $this = $(this);
+				const real = {
 					x: 0,
 					y: 0
 				};
 				// Objects to insert : { ori : {x:0,y:O}, toDo : xxx, done : xxx }
-                const toExpand = {
+				const toExpand = {
 					x: [],
 					y: []
 				};
@@ -71,9 +71,6 @@
 				}
 
 				function contentCheckup(data){
-					// Replacing dot(.) with comma (,) makes decimal values incorrect.
-					// better to commit cout this line.
-					//data = data.replace(/\./g, ','); older
 					if(settings.escapeContent) return data.replace(/([\\"])/g, '\\$1');
 					
 					return data;
@@ -103,11 +100,11 @@
 
 					return blob;
 				}
-                
-                //BEFORESTART CALLBACK
-                settings.beforeStart.call(null, $this);
-                
-                $('tr', $this).each(function(){
+				
+				//BEFORESTART CALLBACK
+				settings.beforeStart.call(null, $this);
+				
+				$('tr', $this).each(function(){
 					const currentTR = $(this);
 					
 					currentTR.children().each(function(){
@@ -144,10 +141,7 @@
 						for(let i = 0; i < currentCellNodes.length; i++){
 							currentCellString += (currentCellNodes[i].innerText || currentCellNodes[i].textContent.replace(/\s/g, '').length ? currentCellNodes[i].textContent : '') + ' ';
 						}
-						// using regx to add space in column val creates problem as it appends space on boths sides. 
-						//currentCellString = contentCheckup(currentCellString).replace(/\s+/g, ' '); // older
-						// we can simply trims space and let intra space be there
-						currentCellString = currentCellString.trim(); // updated
+						currentCellString = contentCheckup(currentCellString).trim();
 						
 						theString+='"'+currentCellString+'",';
 						real.x++;
@@ -158,16 +152,13 @@
 					theString+='\r\n';
 					real.x=0;
 					real.y++;
-                });
-                
+				});
+				
 				settings.onStringReady.call(null, theString);
 
 				const
 					fileData = window.btoa(unescape(encodeURIComponent(theString))),
-				      // appedning .csv to file title makes it filen_name.csv.csv
-				      // it is better to commit .csv appending string
-					// title = settings.title + '.csv'; // older
-				      title = settings.title // updated
+					title = settings.title;
 				
 				// IE Fix
 				if(navigator.userAgent.indexOf('MSIE ') > 0 || navigator.userAgent.match(/Trident.*rv\:11\./)){
@@ -181,7 +172,7 @@
 					a.download = title;
 					a.click();
 				}
-            });
-        }
-    });
+			});
+		}
+	});
 }(jQuery));
