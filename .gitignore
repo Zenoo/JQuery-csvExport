@@ -1,3 +1,4 @@
 example.html
 .eslintrc
 .eslintignore
+node_modules

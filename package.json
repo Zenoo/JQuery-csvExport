@@ -10,6 +10,9 @@
     "export",
     "table"
   ],
+  "scripts": {
+		"release": "standard-version -s"
+	},
   "version": "1.4.0",
   "main": "csvExport.js",
   "author": {
@@ -33,5 +36,20 @@
   "repository": "https://github.com/Zenoo/JQuery-csvExport#readme",
   "dependencies": {
     "jquery": ">=1.4"
-  }
+  },
+  "devDependencies": {
+    "standard-version": "^7.0.0"
+  },
+	"standard-version": {
+		"types": [
+			{"type": "feat", "section": "Features"},
+			{"type": "fix", "section": "Bug Fixes"},
+			{"type": "chore", "hidden": true},
+			{"type": "docs", "section": "Documentation"},
+			{"type": "style", "section": "Visual updates"},
+			{"type": "refactor", "section": "Refactoring"},
+			{"type": "perf", "section": "Performance"},
+			{"type": "test", "section": "Tests"}
+		]
+	}
 }

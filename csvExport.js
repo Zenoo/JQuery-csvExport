@@ -170,7 +170,15 @@
 
 					a.href = 'data:application/vnd.ms-excel;base64,' + fileData;
 					a.download = title;
+
+					// Append to current DOM to allow click trigger
+					a.style.display = 'none';
+					document.body.appendChild(a);
+
 					a.click();
+
+					// Cleanup
+					a.remove();
 				}
 			});
 		}
