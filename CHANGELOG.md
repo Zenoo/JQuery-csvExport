@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.3](https://github.com/Zenoo/JQuery-csvExport/compare/v1.4.2...v1.4.3) (2025-01-07)
+
+
+### Bug Fixes
+
+* Auto publish on release ([e12f2e6](https://github.com/Zenoo/JQuery-csvExport/commit/e12f2e6463550e7fcd92ed5fcad347637990b6d4))
+
 ### [1.4.2](https://github.com/Zenoo/JQuery-csvExport/compare/v1.4.1...v1.4.2) (2021-03-31)
 
 

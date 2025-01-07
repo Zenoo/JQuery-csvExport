@@ -13,7 +13,7 @@
   "scripts": {
     "release": "standard-version -s"
   },
-  "version": "1.4.2",
+  "version": "1.4.3",
   "main": "csvExport.js",
   "author": {
     "name": "Zenoo",
